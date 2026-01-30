@@ -3,7 +3,6 @@
 import { z } from 'zod';
 import prisma from './lib/prisma';
 import { revalidatePath } from 'next/cache';
-import { Specialty } from '@prisma/client';
 
 // Schema validado para a jornada da Life Clinic
 const AppointmentSchema = z.object({
@@ -27,11 +26,7 @@ export async function createAppointment(formData: FormData) {
 
   try {
     // 1. Mapeia a categoria para a Especialidade do banco
-    const specialtyMap: Record<string, Specialty> = {
-      'Ginecologista': 'GYNECOLOGIST',
-      'Especialista': 'REPRODUCTION_SPECIALIST'
-    };
-    const targetSpecialty = specialtyMap[validatedFields.data.category];
+    const targetSpecialty = validatedFields.data.category as 'Ginecologista' | 'Especialista';
 
     // 2. Busca um profissional disponível (regra simples: o primeiro encontrado)
     const professional = await prisma.professional.findFirst({

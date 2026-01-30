@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createAppointment } from "@/actions";
+import { createAppointment } from "../actions";
 import { PlusCircle, X } from "lucide-react";
 
 export function AppointmentModal() {

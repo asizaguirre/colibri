@@ -20,8 +20,8 @@ enum Role {
 }
 
 enum Specialty {
-  GYNECOLOGIST
-  REPRODUCTION_SPECIALIST
+  Ginecologista
+  Especialista
 }
 
 enum AppointmentStatus {
