@@ -3,13 +3,13 @@
 import { z } from 'zod';
 import prisma from './lib/prisma';
 import { revalidatePath } from 'next/cache';
-import { Specialty } from '@prisma/client';
+import { Specialty, Role, AppointmentStatus } from '@prisma/client';
 
 // Schema validado para a jornada da Life Clinic
 const AppointmentSchema = z.object({
   name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres"),
   email: z.string().email("E-mail inválido"),
-  category: z.enum(["Ginecologista", "Especialista"]),
+  category: z.enum([Specialty.GYNECOLOGIST, "Especialista"]),
 });
 
 export async function getDashboardData() {
@@ -46,7 +46,7 @@ export async function createAppointment(formData: FormData) {
   try {
     // 1. Trata a categoria como string para evitar conflitos de Enum
     const specialtyMap: Record<string, Specialty> = {
-      "Ginecologista": Specialty.GYNECOLOGIST,
+      Specialty.GYNECOLOGIST: Specialty.GYNECOLOGIST,
       "Especialista": Specialty.OBSTETRICIAN
     };
     const targetSpecialty = specialtyMap[validatedFields.data.category];
@@ -64,7 +64,7 @@ export async function createAppointment(formData: FormData) {
     await prisma.appointment.create({
       data: {
         date: new Date(), // Define data atual para "Fila de Espera"
-        status: 'PENDING',
+        status: AppointmentStatus.PENDING,
         notes: `Solicitação via Dashboard. Categoria: ${validatedFields.data.category}`,
         professional: { connect: { id: professional.id } },
         patient: {
@@ -73,7 +73,7 @@ export async function createAppointment(formData: FormData) {
             create: {
               email: validatedFields.data.email,
               name: validatedFields.data.name,
-              role: 'PATIENT'
+              role: Role.PATIENT
             },
           },
         },
@@ -114,7 +114,7 @@ export async function scheduleAppointment(formData: FormData) {
     await prisma.appointment.create({
       data: {
         date: new Date(validated.data.date),
-        status: 'PENDING',
+        status: AppointmentStatus.PENDING,
         notes: "Agendamento via BookingModal (Ciclo Completo)",
         professional: { connect: { id: Number(validated.data.professionalId) } },
         patient: {
@@ -123,7 +123,7 @@ export async function scheduleAppointment(formData: FormData) {
             create: {
               email: validated.data.email,
               name: validated.data.name,
-              role: 'PATIENT'
+              role: Role.PATIENT
             },
           },
         },

@@ -1,15 +1,16 @@
 import { prisma } from "./prisma";
+import { Specialty } from "@prisma/client";
 import { AppointmentModal } from "./appointment-modal";
 import { Heart, Activity, User, Stethoscope, Baby, Pill } from "lucide-react";
 
 export default async function DashboardPage() {
   const gynecologists = await prisma.professional.findMany({
-    where: { specialty: "Ginecologista" },
+    where: { specialty: Specialty.GYNECOLOGIST },
     include: { user: true },
   });
 
   const specialists = await prisma.professional.findMany({
-    where: { specialty: "Especialista" },
+    where: { specialty: Specialty.OBSTETRICIAN },
     include: { user: true },
   });
 

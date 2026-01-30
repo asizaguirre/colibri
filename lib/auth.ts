@@ -1,6 +1,7 @@
 import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { prisma } from "./prisma";
+import { Role } from "@prisma/client";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -26,7 +27,7 @@ export const authOptions: NextAuthOptions = {
               name: user.name,
               googleId: account.providerAccountId,
               image: user.image,
-              role: "PATIENT",
+              role: Role.PATIENT,
             },
           });
           return true;

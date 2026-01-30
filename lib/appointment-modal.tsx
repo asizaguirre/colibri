@@ -52,7 +52,7 @@ export function AppointmentModal() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Especialidade</label>
                 <select name="category" className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none">
-                  <option value="Ginecologista">Ginecologista (Pré-Concepção)</option>
+                  <option value=Specialty.GYNECOLOGIST>Ginecologista (Pré-Concepção)</option>
                   <option value="Especialista">Especialista em Reprodução</option>
                 </select>
               </div>

@@ -9,7 +9,7 @@ async function main() {
     data: {
       email: "paciente@teste.com",
       name: "Paciente Teste",
-      role: "PATIENT",
+      role: Role.PATIENT,
     },
   });
 
@@ -18,7 +18,7 @@ async function main() {
     data: {
       email: "profissional@teste.com",
       name: "Dr. Ginecologista",
-      role: "PROFESSIONAL",
+      role: Role.PROFESSIONAL,
       professionalProfile: {
         create: {
           crm: "12345",
