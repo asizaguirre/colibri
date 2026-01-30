@@ -1,21 +1,15 @@
-import { prisma } from "../lib/prisma";
-import { User } from "@prisma/client"; // importa o tipo gerado
+import { prisma } from "@/lib/prisma";
+import { User } from "@prisma/client";
 
-// Tipo serializado (datas como string)
 type SerializedUser = Omit<User, "createdAt" | "updatedAt"> & {
   createdAt: string;
   updatedAt: string;
 };
 
-type Props = {
-  users: SerializedUser[];
-};
-
 export async function getServerSideProps() {
-  const users: User[] = await prisma.user.findMany();
-
-  // Date objects não são serializáveis, então convertemos para string
-  const serializedUsers: SerializedUser[] = users.map((user: User) => ({
+  const users = await prisma.user.findMany();
+  
+  const serializedUsers = users.map((user) => ({
     ...user,
     createdAt: user.createdAt.toISOString(),
     updatedAt: user.updatedAt.toISOString(),
@@ -24,15 +18,18 @@ export async function getServerSideProps() {
   return { props: { users: serializedUsers } };
 }
 
-export default function Home({ users }: Props) {
+export default function UsersPage({ users }: { users: SerializedUser[] }) {
   return (
-    <div>
-      <h1>Usuários</h1>
+    <main>
+      <h1>Usuários cadastrados</h1>
       <ul>
         {users.map((u) => (
-          <li key={u.id}>{u.name}</li>
+          <li key={u.id}>
+            <a href={`/users/${u.id}`}>{u.email}</a>
+          </li>
         ))}
       </ul>
-    </div>
+      <a href="/users/create">Criar novo usuário</a>
+    </main>
   );
 }
