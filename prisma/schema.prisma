@@ -1,17 +1,11 @@
-// prisma/schema.prisma
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
-
-
-// -----------------------------------------------------------------------------
-// Enums
-// -----------------------------------------------------------------------------
 
 enum Role {
   PATIENT
@@ -20,8 +14,9 @@ enum Role {
 }
 
 enum Specialty {
-  Ginecologista
-  Especialista
+  GYNECOLOGIST
+  OBSTETRICIAN
+  PEDIATRICIAN
 }
 
 enum AppointmentStatus {
@@ -31,32 +26,28 @@ enum AppointmentStatus {
   COMPLETED
 }
 
-// -----------------------------------------------------------------------------
-// Models
-// -----------------------------------------------------------------------------
-
 model User {
-  id            Int       @id @default(autoincrement())
-  email         String    @unique
+  id            Int           @id @default(autoincrement())
+  email         String        @unique
   name          String?
-  googleId      String?   @unique
+  googleId      String?       @unique
   image         String?
-  role          Role      @default(PATIENT)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  role          Role          @default(PATIENT)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 
   professionalProfile Professional?
   appointments        Appointment[]
 }
 
 model Professional {
-  id          Int       @id @default(autoincrement())
+  id          Int           @id @default(autoincrement())
   crm         String?
   bio         String?
   specialty   Specialty
-  
-  userId      Int       @unique
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  userId      Int           @unique
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   appointments Appointment[]
 }
@@ -76,6 +67,9 @@ model Appointment {
 
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
+
+  @@index([date])
+  @@index([status])
 }
 
 model Supply {
@@ -89,4 +83,6 @@ model Supply {
 
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+
+  @@index([name])
 }

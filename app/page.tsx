@@ -14,7 +14,7 @@ import { getServerSession } from "next-auth";
 import Link from "next/link";
 
 type Professional = {
-  id: string;
+  id: number;
   specialty: string;
   user: {
     name: string | null;
@@ -23,7 +23,7 @@ type Professional = {
 };
 
 type Supply = {
-  id: string;
+  id: number;
   name: string;
   quantity: number;
   unit: string;
