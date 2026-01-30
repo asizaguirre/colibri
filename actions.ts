@@ -3,23 +3,18 @@
 import { z } from 'zod';
 import prisma from './lib/prisma';
 import { revalidatePath } from 'next/cache';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '../lib/auth';
-import { Specialty } from '../generated/prisma';
+import { Specialty } from './generated/prisma';
 
 // -----------------------------------------------------------------------------
 // Schemas de Validação (Zod)
 // -----------------------------------------------------------------------------
 
 const AppointmentSchema = z.object({
-  professionalId: z.coerce.number().min(1, "Selecione um profissional válido"),
-  date: z.coerce.date().min(new Date(), "A data do agendamento deve ser futura"),
-  notes: z.string().optional(),
-});
-
-const SupplyUpdateSchema = z.object({
-  id: z.number().int().positive(),
-  quantity: z.number().int().min(0, "A quantidade não pode ser negativa"),
+  name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres"),
+  email: z.string().email("Formato de e-mail inválido"),
+  category: z.enum(["Ginecologista", "Especialista"], {
+    errorMap: () => ({ message: "Selecione uma categoria válida" }),
+  }),
 });
 
 // -----------------------------------------------------------------------------
@@ -28,98 +23,62 @@ const SupplyUpdateSchema = z.object({
 
 /**
  * Cria um novo agendamento no banco de dados.
- * Equivalente a POST /appointment
+ * Valida nome, email e categoria, cria o usuário se necessário e agenda.
  */
 export async function createAppointment(formData: FormData) {
-  // 1. Segurança: Verifica sessão
-  const session = await getServerSession(authOptions);
-  if (!session || !session.user) {
-    return { error: "Você precisa estar logado para agendar." };
-  }
-
-  // 2. Extração e Validação
   const rawData = {
-    professionalId: formData.get('professionalId'),
-    date: formData.get('date'),
-    notes: formData.get('notes'),
+    name: formData.get('name'),
+    email: formData.get('email'),
+    category: formData.get('category'),
   };
 
   const validated = AppointmentSchema.safeParse(rawData);
 
   if (!validated.success) {
-    // Retorna erros formatados para o frontend
     return { error: "Dados inválidos", issues: validated.error.flatten().fieldErrors };
   }
 
-  const { professionalId, date, notes } = validated.data;
+  const { name, email, category } = validated.data;
 
   try {
-    // 3. Persistência
-    // @ts-expect-error - O ID foi injetado na sessão no passo anterior (auth.ts)
-    const patientId = session.user.id;
+    // 1. Busca ou Cria o Paciente (User)
+    let user = await prisma.user.findUnique({ where: { email } });
+    
+    if (!user) {
+      user = await prisma.user.create({
+        data: { email, name, role: 'PATIENT' },
+      });
+    }
 
+    // 2. Mapeia Categoria para Specialty e busca Profissional
+    const specialtyMap: Record<string, Specialty> = {
+      'Ginecologista': 'GYNECOLOGIST',
+      'Especialista': 'REPRODUCTION_SPECIALIST',
+    };
+
+    const professional = await prisma.professional.findFirst({
+      where: { specialty: specialtyMap[category] },
+    });
+
+    if (!professional) {
+      return { error: "Nenhum profissional disponível para esta especialidade." };
+    }
+
+    // 3. Cria o Agendamento (Data atual como padrão para "fila de espera")
     await prisma.appointment.create({
       data: {
-        date,
-        notes,
+        date: new Date(),
         status: 'PENDING',
-        patientId: Number(patientId),
-        professionalId: professionalId,
+        patientId: user.id,
+        professionalId: professional.id,
+        notes: `Solicitação via site. Categoria: ${category}`,
       },
     });
 
-    // 4. Revalidação (Atualiza a UI sem refresh)
     revalidatePath('/dashboard');
-    return { success: true, message: "Consulta agendada com sucesso!" };
+    return { success: true, message: "Agendamento solicitado com sucesso!" };
   } catch (error) {
     console.error("Erro ao criar agendamento:", error);
-    return { error: "Erro interno ao processar agendamento." };
-  }
-}
-
-/**
- * Busca profissionais, opcionalmente filtrando por especialidade.
- * Equivalente a GET /professionals
- */
-export async function getProfessionals(specialty?: string) {
-  try {
-    const where = specialty ? { specialty: specialty as Specialty } : {};
-    
-    return await prisma.professional.findMany({
-      where,
-      include: {
-        user: {
-          select: { name: true, image: true }, // Traz apenas dados necessários
-        },
-      },
-    });
-  } catch (error) {
-    console.error("Erro ao buscar profissionais:", error);
-    return [];
-  }
-}
-
-/**
- * Atualiza a quantidade de um insumo.
- * Equivalente a PATCH /supplies
- */
-export async function updateSupply(id: number, quantity: number) {
-  const validated = SupplyUpdateSchema.safeParse({ id, quantity });
-
-  if (!validated.success) {
-    return { error: "Quantidade inválida." };
-  }
-
-  try {
-    await prisma.supply.update({
-      where: { id },
-      data: { quantity },
-    });
-
-    revalidatePath('/dashboard');
-    return { success: true };
-  } catch (error) {
-    console.error("Erro ao atualizar estoque:", error);
-    return { error: "Falha ao atualizar estoque." };
+    return { error: "Erro interno ao processar sua solicitação." };
   }
 }
