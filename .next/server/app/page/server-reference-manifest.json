@@ -1,4 +1,20 @@
 {
-  "node": {},
+  "node": {
+    "402c42c30870e868450c2f8dcb44ec2981c63c1590": {
+      "workers": {
+        "app/page": {
+          "moduleId": 76935,
+          "async": false,
+          "exportedName": "createAppointment",
+          "filename": "actions.ts"
+        }
+      },
+      "layer": {
+        "app/page": "action-browser"
+      },
+      "exportedName": "createAppointment",
+      "filename": "actions.ts"
+    }
+  },
   "edge": {}
 }

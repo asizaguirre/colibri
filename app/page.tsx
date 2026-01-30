@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { getDashboardData } from "@/actions";
 import { Supply } from "@prisma/client";
 import { AppointmentModal } from "@/lib/appointment-modal";
 import { 
@@ -12,11 +13,14 @@ import {
   ArrowRight
 } from "lucide-react";
 
+export const dynamic = 'force-dynamic';
+
 export default async function DashboardPage() {
   const gynecologists = await prisma.professional.findMany({
     where: { specialty: "Ginecologista" },
     include: { user: true },
   });
+  const { gynecologists, specialists, supplies } = await getDashboardData();
 
   const specialists = await prisma.professional.findMany({
     where: { specialty: "Especialista" },
