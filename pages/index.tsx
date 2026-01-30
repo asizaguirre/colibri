@@ -1,5 +1,5 @@
 import { prisma } from "../lib/prisma";
-import { User } from "@prisma/client"; // importa o tipo gerado
+import { User } from "@prisma/client";
 
 type Props = {
   users: User[];
@@ -7,23 +7,22 @@ type Props = {
 
 export async function getServerSideProps() {
   const users = await prisma.user.findMany();
+  return { props: { users } };
+}
 
-  // Date objects are not serializable, so we convert them to strings.
+export default function Home({ users }: Props) {
+  // Agora o parâmetro user tem tipo User
   const serializedUsers = users.map((user) => ({
     ...user,
     createdAt: user.createdAt.toISOString(),
     updatedAt: user.updatedAt.toISOString(),
   }));
 
-  return { props: { users: serializedUsers } };
-}
-
-export default function Home({ users }: Props) {
   return (
     <div>
       <h1>Usuários</h1>
       <ul>
-        {users.map((u) => (
+        {serializedUsers.map((u) => (
           <li key={u.id}>{u.name}</li>
         ))}
       </ul>
