@@ -20,34 +20,14 @@ Plataforma de saúde reprodutiva focada na jornada da infertilidade, conectando 
 
 ```mermaid
 graph TD
-    %% Estilos
-    classDef user fill:#f9f,stroke:#333,stroke-width:2px;
-    classDef app fill:#0070f3,stroke:#fff,stroke-width:2px,color:#fff;
-    classDef auth fill:#ea4335,stroke:#fff,stroke-width:2px,color:#fff;
-    classDef db fill:#336791,stroke:#fff,stroke-width:2px,color:#fff;
-    classDef orm fill:#1a202c,stroke:#fff,stroke-width:2px,color:#fff;
-
-    User((Usuário)):::user
-    
-    subgraph Vercel_Ecosystem [Vercel Cloud]
-        NextJS[Next.js 14 App Router]:::app
-        API[Server Actions / API Routes]:::app
-    end
-
-    Google[Google Auth<br/>OAuth 2.0 Provider]:::auth
-    Prisma[Prisma ORM]:::orm
-    Postgres[(PostgreSQL)]:::db
-
-    %% Fluxos
-    User -->|HTTPS / Browser| NextJS
-    NextJS -->|Autenticação| Google
-    NextJS -->|Dados via Server Actions| API
-    API -->|Query Builder| Prisma
-    Prisma -->|TCP Connection| Postgres
-
-    %% Legenda de retorno
-    Google -.->|Token JWT| NextJS
-    Postgres -.->|Dados JSON| Prisma
+    A[Casal/Usuário] -->|Acesso HTTPS| B(Vercel - Next.js App)
+    B -->|Auth| C{Google Auth}
+    B -->|ORM| D[Prisma Client]
+    D -->|SSL Connection| E[(PostgreSQL - db.prisma.io)]
+    B -->|UI/UX| F[Rede de Acolhimento]
+    F -->|Integração| G[Ginecologistas]
+    F -->|Integração| H[Especialistas]
+    B -->|Monitoramento| I[Smart Insumos]
 ```
 
 ### Jornada do Paciente (Contexto)

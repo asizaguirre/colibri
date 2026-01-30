@@ -8,9 +8,7 @@ import { revalidatePath } from 'next/cache';
 const AppointmentSchema = z.object({
   name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres"),
   email: z.string().email("E-mail inválido"),
-  category: z.enum(["Ginecologista", "Especialista"], {
-    required_error: "Selecione uma categoria válida",
-  }),
+  category: z.enum(["Ginecologista", "Especialista"]),
 });
 
 export async function createAppointment(formData: FormData) {
@@ -25,8 +23,8 @@ export async function createAppointment(formData: FormData) {
   }
 
   try {
-    // 1. Mapeia a categoria para a Especialidade do banco
-    const targetSpecialty = validatedFields.data.category as 'Ginecologista' | 'Especialista';
+    // 1. Trata a categoria como string para evitar conflitos de Enum
+    const targetSpecialty = validatedFields.data.category as any;
 
     // 2. Busca um profissional disponível (regra simples: o primeiro encontrado)
     const professional = await prisma.professional.findFirst({

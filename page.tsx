@@ -1,15 +1,15 @@
-import { prisma } from "../../lib/prisma";
-import { Heart, Baby, Pill, Stethoscope, Activity, User } from "lucide-react";
+import { prisma } from '@/lib/prisma';
+import { AppointmentModal } from '@/lib/appointment-modal';
+import { Heart, Activity, User, Stethoscope, Baby, Pill } from "lucide-react";
 
 export default async function DashboardPage() {
-  // Buscando dados reais do banco de dados
   const gynecologists = await prisma.professional.findMany({
-    where: { specialty: 'GYNECOLOGIST' },
+    where: { specialty: "Ginecologista" },
     include: { user: true },
   });
 
   const specialists = await prisma.professional.findMany({
-    where: { specialty: 'REPRODUCTION_SPECIALIST' },
+    where: { specialty: "Especialista" },
     include: { user: true },
   });
 
@@ -18,111 +18,124 @@ export default async function DashboardPage() {
   });
 
   return (
-    <div className="min-h-screen bg-rose-50/30">
+    <div className="min-h-screen bg-slate-50 text-slate-900">
       {/* Header */}
-      <header className="bg-white border-b border-rose-100 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center gap-3">
-          <div className="p-2 bg-rose-100 rounded-lg">
-            <Heart className="h-6 w-6 text-rose-500" />
+      <header className="bg-white/80 backdrop-blur-md border-b border-slate-100 sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-24 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-[#00a3e0]/10 rounded-2xl">
+              <Heart className="h-8 w-8 text-[#00a3e0]" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-[#00a3e0] tracking-tight">Colibri 2.0</h1>
+              <p className="text-slate-500 text-sm font-medium">Rede de Acolhimento Life Clinic</p>
+            </div>
           </div>
-          <h1 className="text-xl font-semibold text-gray-800">
-            Colibri 2.0 <span className="text-gray-400 font-normal">| Rede de Acolhimento</span>
-          </h1>
+          <AppointmentModal />
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
-        
-        {/* Seção 1: Pré-Concepção (Ginecologistas) */}
-        <section>
-          <div className="flex items-center gap-2 mb-4">
-            <Stethoscope className="h-5 w-5 text-teal-600" />
-            <h2 className="text-lg font-bold text-gray-800">Pré-Concepção: Ginecologia</h2>
-          </div>
-          
-          {gynecologists.length === 0 ? (
-            <p className="text-gray-500 text-sm italic">Nenhum ginecologista disponível no momento.</p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {gynecologists.map((pro) => (
-                <div key={pro.id} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                  <div className="flex items-start gap-4">
-                    <div className="h-12 w-12 rounded-full bg-teal-50 flex items-center justify-center border border-teal-100">
-                      {pro.user.image ? (
-                        <img src={pro.user.image} alt={pro.user.name || "Médico"} className="h-12 w-12 rounded-full object-cover" />
-                      ) : (
-                        <User className="h-6 w-6 text-teal-600" />
-                      )}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 lg:grid-cols-3 gap-10">
+
+        {/* Coluna Principal */}
+        <div className="lg:col-span-2 space-y-12">
+
+          {/* Pré-Concepção */}
+          <section>
+            <div className="flex items-center gap-4 mb-6">
+              <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100">
+                <Stethoscope className="h-6 w-6 text-[#00a3e0]" />
+              </div>
+              <h2 className="text-2xl font-bold text-slate-800">Pré-Concepção</h2>
+            </div>
+            <div className="grid gap-6 sm:grid-cols-2">
+              {gynecologists.map((doc) => (
+                <div key={doc.id} className="bg-white p-6 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-50 group">
+                  <div className="flex items-center gap-4">
+                    <div className="h-16 w-16 rounded-full bg-slate-50 flex items-center justify-center overflow-hidden border-4 border-slate-50 shadow-sm group-hover:border-[#00a3e0]/20 transition-colors">
+                      {doc.user.image ? <img src={doc.user.image} alt={doc.user.name || "Médico"} className="w-full h-full object-cover" /> : <User className="h-8 w-8 text-[#00a3e0]" />}
                     </div>
                     <div>
-                      <h3 className="font-medium text-gray-900">{pro.user.name || "Dr(a)."}</h3>
-                      <p className="text-sm text-teal-600 font-medium">CRM: {pro.crm || "N/A"}</p>
-                      <p className="text-xs text-gray-500 mt-1 line-clamp-2">{pro.bio || "Sem descrição."}</p>
+                      <p className="font-bold text-slate-900 text-lg">{doc.user.name}</p>
+                      <p className="text-sm text-[#00a3e0] font-medium">Ginecologista</p>
+                      <p className="text-xs text-slate-400 mt-2 bg-slate-50 px-3 py-1 rounded-full inline-block font-medium">CRM: {doc.crm || "N/A"}</p>
                     </div>
                   </div>
                 </div>
               ))}
+               {gynecologists.length === 0 && <p className="text-slate-500 italic pl-2">Nenhum profissional disponível.</p>}
             </div>
-          )}
-        </section>
+          </section>
 
-        {/* Seção 2: Concepção (Especialistas) */}
-        <section>
-          <div className="flex items-center gap-2 mb-4">
-            <Baby className="h-5 w-5 text-rose-500" />
-            <h2 className="text-lg font-bold text-gray-800">Concepção: Reprodução Assistida</h2>
-          </div>
-
-          {specialists.length === 0 ? (
-            <p className="text-gray-500 text-sm italic">Nenhum especialista disponível no momento.</p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {specialists.map((pro) => (
-                <div key={pro.id} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                  <div className="flex items-start gap-4">
-                    <div className="h-12 w-12 rounded-full bg-rose-50 flex items-center justify-center border border-rose-100">
-                      {pro.user.image ? (
-                        <img src={pro.user.image} alt={pro.user.name || "Médico"} className="h-12 w-12 rounded-full object-cover" />
-                      ) : (
-                        <User className="h-6 w-6 text-rose-500" />
-                      )}
+          {/* Concepção */}
+          <section>
+            <div className="flex items-center gap-4 mb-6">
+              <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100">
+                <Baby className="h-6 w-6 text-rose-500" />
+              </div>
+              <h2 className="text-2xl font-bold text-slate-800">Concepção</h2>
+            </div>
+            <div className="grid gap-6 sm:grid-cols-2">
+              {specialists.map((doc) => (
+                <div key={doc.id} className="bg-white p-6 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-50 group">
+                  <div className="flex items-center gap-4">
+                    <div className="h-16 w-16 rounded-full bg-rose-50 flex items-center justify-center overflow-hidden border-4 border-rose-50 shadow-sm group-hover:border-rose-100 transition-colors">
+                      {doc.user.image ? <img src={doc.user.image} alt={doc.user.name || "Médico"} className="w-full h-full object-cover" /> : <User className="h-8 w-8 text-rose-400" />}
                     </div>
                     <div>
-                      <h3 className="font-medium text-gray-900">{pro.user.name || "Dr(a)."}</h3>
-                      <p className="text-sm text-rose-500 font-medium">CRM: {pro.crm || "N/A"}</p>
-                      <p className="text-xs text-gray-500 mt-1 line-clamp-2">{pro.bio || "Sem descrição."}</p>
+                      <p className="font-bold text-slate-900 text-lg">{doc.user.name}</p>
+                      <p className="text-sm text-rose-600 font-medium">Especialista em Reprodução</p>
+                      <p className="text-xs text-slate-400 mt-2 bg-slate-50 px-3 py-1 rounded-full inline-block font-medium">CRM: {doc.crm || "N/A"}</p>
                     </div>
                   </div>
                 </div>
               ))}
+               {specialists.length === 0 && <p className="text-slate-500 italic pl-2">Nenhum profissional disponível.</p>}
             </div>
-          )}
-        </section>
+          </section>
+        </div>
 
-        {/* Seção 3: Smart Insumos */}
-        <section>
-          <div className="flex items-center gap-2 mb-4">
-            <Activity className="h-5 w-5 text-indigo-500" />
-            <h2 className="text-lg font-bold text-gray-800">Smart Insumos</h2>
-          </div>
+        {/* Coluna Lateral: Smart Insumos */}
+        <aside className="space-y-8">
+          <div className="bg-white p-8 rounded-3xl shadow-lg border border-slate-50 relative overflow-hidden">
+            {/* Elemento decorativo de fundo */}
+            <div className="absolute top-0 right-0 w-40 h-40 bg-[#00a3e0]/5 rounded-bl-[4rem] -mr-8 -mt-8"></div>
+            
+            <div className="flex items-center gap-4 mb-8 relative z-10">
+              <div className="p-3 bg-[#00a3e0]/10 rounded-2xl">
+                <Activity className="h-6 w-6 text-[#00a3e0]" />
+              </div>
+              <h3 className="font-bold text-xl text-slate-800">Smart Insumos</h3>
+            </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-gray-100">
-              {supplies.map((item) => (
-                <div key={item.id} className="p-5 flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">{item.name}</p>
-                    <p className="text-2xl font-bold text-gray-900 mt-1">{item.quantity} <span className="text-xs font-normal text-gray-400">{item.unit}</span></p>
+            <div className="space-y-4 relative z-10">
+              {(supplies.length > 0 ? supplies : [
+                { id: 991, name: 'Ácido Fólico', quantity: 30, unit: 'caps', minQuantity: 10 },
+                { id: 992, name: 'Vitaminas', quantity: 5, unit: 'caps', minQuantity: 10 }
+              ]).map((item) => (
+                 <div key={item.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-[#00a3e0]/30 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-white rounded-xl shadow-sm">
+                        <Pill className="h-5 w-5 text-[#00a3e0]" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-900 text-sm">{item.name}</p>
+                      <p className="text-xs text-slate-500">{item.quantity} {item.unit}</p>
+                    </div>
                   </div>
-                  <div className={`p-2 rounded-full ${item.quantity <= item.minQuantity ? 'bg-red-50 text-red-500' : 'bg-green-50 text-green-500'}`}>
-                    <Pill className="h-5 w-5" />
-                  </div>
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${item.quantity <= item.minQuantity ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600'}`}>
+                    {item.quantity <= item.minQuantity ? 'Repor' : 'Em Estoque'}
+                  </span>
                 </div>
               ))}
-              {supplies.length === 0 && <div className="p-5 text-gray-500 text-sm">Estoque vazio.</div>}
             </div>
+            
+            <button className="w-full mt-8 py-4 text-sm text-white font-bold bg-[#00a3e0] hover:bg-[#008bbd] rounded-2xl transition-colors shadow-md shadow-[#00a3e0]/20">
+              Gerenciar Estoque
+            </button>
           </div>
-        </section>
+        </aside>
+
       </main>
     </div>
   );
