@@ -3,82 +3,69 @@
 import { z } from 'zod';
 import prisma from './lib/prisma';
 import { revalidatePath } from 'next/cache';
-import { Specialty } from './generated/prisma';
+import { Specialty } from '@prisma/client';
 
-// -----------------------------------------------------------------------------
-// Schemas de Validação (Zod)
-// -----------------------------------------------------------------------------
-
+// Schema validado para a jornada da Life Clinic
 const AppointmentSchema = z.object({
   name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres"),
-  email: z.string().email("Formato de e-mail inválido"),
+  email: z.string().email("E-mail inválido"),
   category: z.enum(["Ginecologista", "Especialista"], {
-    errorMap: () => ({ message: "Selecione uma categoria válida" }),
+    required_error: "Selecione uma categoria válida",
   }),
 });
 
-// -----------------------------------------------------------------------------
-// Server Actions
-// -----------------------------------------------------------------------------
-
-/**
- * Cria um novo agendamento no banco de dados.
- * Valida nome, email e categoria, cria o usuário se necessário e agenda.
- */
 export async function createAppointment(formData: FormData) {
-  const rawData = {
+  const validatedFields = AppointmentSchema.safeParse({
     name: formData.get('name'),
     email: formData.get('email'),
     category: formData.get('category'),
-  };
+  });
 
-  const validated = AppointmentSchema.safeParse(rawData);
-
-  if (!validated.success) {
-    return { error: "Dados inválidos", issues: validated.error.flatten().fieldErrors };
+  if (!validatedFields.success) {
+    return { error: validatedFields.error.flatten().fieldErrors };
   }
 
-  const { name, email, category } = validated.data;
-
   try {
-    // 1. Busca ou Cria o Paciente (User)
-    let user = await prisma.user.findUnique({ where: { email } });
-    
-    if (!user) {
-      user = await prisma.user.create({
-        data: { email, name, role: 'PATIENT' },
-      });
-    }
-
-    // 2. Mapeia Categoria para Specialty e busca Profissional
+    // 1. Mapeia a categoria para a Especialidade do banco
     const specialtyMap: Record<string, Specialty> = {
       'Ginecologista': 'GYNECOLOGIST',
-      'Especialista': 'REPRODUCTION_SPECIALIST',
+      'Especialista': 'REPRODUCTION_SPECIALIST'
     };
+    const targetSpecialty = specialtyMap[validatedFields.data.category];
 
+    // 2. Busca um profissional disponível (regra simples: o primeiro encontrado)
     const professional = await prisma.professional.findFirst({
-      where: { specialty: specialtyMap[category] },
+      where: { specialty: targetSpecialty }
     });
 
     if (!professional) {
-      return { error: "Nenhum profissional disponível para esta especialidade." };
+      return { error: "Nenhum profissional disponível nesta categoria no momento." };
     }
 
-    // 3. Cria o Agendamento (Data atual como padrão para "fila de espera")
+    // 3. Cria o agendamento e o usuário (se não existir)
     await prisma.appointment.create({
       data: {
-        date: new Date(),
+        date: new Date(), // Define data atual para "Fila de Espera"
         status: 'PENDING',
-        patientId: user.id,
-        professionalId: professional.id,
-        notes: `Solicitação via site. Categoria: ${category}`,
+        notes: `Solicitação via Dashboard. Categoria: ${validatedFields.data.category}`,
+        professional: { connect: { id: professional.id } },
+        patient: {
+          connectOrCreate: {
+            where: { email: validatedFields.data.email },
+            create: {
+              email: validatedFields.data.email,
+              name: validatedFields.data.name,
+              role: 'PATIENT'
+            },
+          },
+        },
       },
     });
 
     revalidatePath('/dashboard');
-    return { success: true, message: "Agendamento solicitado com sucesso!" };
-  } catch (error) {
-    console.error("Erro ao criar agendamento:", error);
-    return { error: "Erro interno ao processar sua solicitação." };
+    return { success: true, message: "Solicitação enviada com sucesso!" };
+  } catch (e) {
+    console.error(e);
+    return { error: "Erro ao conectar com o banco de dados." };
   }
 }
