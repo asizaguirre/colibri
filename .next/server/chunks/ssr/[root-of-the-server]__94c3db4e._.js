@@ -1,0 +1,3 @@
+module.exports=[63021,(a,b,c)=>{b.exports=a.x("@prisma/client-2c3a283f134fdcb6",()=>require("@prisma/client-2c3a283f134fdcb6"))},76935,a=>{"use strict";var b=a.i(91879);a.s([],96389),a.i(96389),a.s(["00311e1d95ac26c8138ad1d2af26b9e50a447536d7",()=>b.getDashboardData,"402c42c30870e868450c2f8dcb44ec2981c63c1590",()=>b.createAppointment,"40fd92ff5fc2b3a3674f3566c8bf15e08b0483ff2c",()=>b.scheduleAppointment],76935)}];
+
+//# sourceMappingURL=%5Broot-of-the-server%5D__94c3db4e._.js.map
