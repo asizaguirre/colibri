@@ -1,3 +1,3 @@
-module.exports=[63021,(a,b,c)=>{b.exports=a.x("@prisma/client-2c3a283f134fdcb6",()=>require("@prisma/client-2c3a283f134fdcb6"))},76935,a=>{"use strict";var b=a.i(91879);a.s([],96389),a.i(96389),a.s(["0074c0be152abf755793ce4153a779e15bb343e153",()=>b.getDashboardData,"403847612ec244f24dbb578ab8d9da5b627f2e0a25",()=>b.scheduleAppointment,"40bdef33ea7682991c25774c974787757ccf9e473e",()=>b.createAppointment],76935)}];
+module.exports=[63021,(a,b,c)=>{b.exports=a.x("@prisma/client-2c3a283f134fdcb6",()=>require("@prisma/client-2c3a283f134fdcb6"))},76935,a=>{"use strict";var b=a.i(91879);a.s([],96389),a.i(96389),a.s(["0031e49b6151a8e6a34e0d604403c5b6912bb22e1f",()=>b.getDashboardData,"4034a29572ea626801613b4de540a2cb1e4d53ba90",()=>b.scheduleAppointment,"40d36924865e2faa590cee26cc2658f2a5930adc4a",()=>b.createAppointment],76935)}];
 
 //# sourceMappingURL=%5Broot-of-the-server%5D__94c3db4e._.js.map
