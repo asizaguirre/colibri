@@ -1,9 +1,10 @@
 'use server';
 
 import { z } from 'zod';
-import prisma from './lib/prisma';
+import { prisma } from './lib/prisma';   // ✅ import nomeado
 import { revalidatePath } from 'next/cache';
 import { Specialty, Role, AppointmentStatus } from '@prisma/client';
+
 
 // Schema validado para a jornada da Life Clinic
 const AppointmentSchema = z.object({
