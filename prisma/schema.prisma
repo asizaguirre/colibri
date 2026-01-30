@@ -33,6 +33,7 @@ model User {
   googleId      String?       @unique
   image         String?
   role          Role          @default(PATIENT)
+  password      String?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 

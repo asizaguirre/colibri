@@ -10,11 +10,7 @@ export default defineConfig({
     seed: "tsx prisma/seed.ts",
   },
   datasource: {
-    adapter: {
-      provider: "postgresql",
-      url: process.env.DATABASE_URL!, // ✅ conexão direta
-    },
-    // Se quiser usar Accelerate (Data Proxy):
-    // accelerateUrl: process.env.ACCELERATE_URL,
+    // A url deve ficar diretamente aqui, sem 'adapter'
+    url: process.env.DATABASE_URL!,
   },
 });

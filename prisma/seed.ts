@@ -23,6 +23,7 @@ async function main() {
       email: "profissional@teste.com",
       name: "Dr. Ginecologista",
       role: Role.PROFESSIONAL,
+      password: senhaHash,
       professionalProfile: {
         create: {
           crm: "12345",
