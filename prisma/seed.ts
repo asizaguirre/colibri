@@ -1,21 +1,21 @@
-import 'dotenv/config';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 async function main() {
   await prisma.user.create({
     data: {
-      email: "test@test.com",
-      name: "Test User",
+      email: "paciente@example.com",
+      name: "Maria Silva",
+      role: "PATIENT",
     },
   });
 }
 
 main()
-  .then(() => console.log("✅ Seed concluído"))
-  .catch(e => {
-    console.error("❌ Erro no seed:", e);
+  .then(() => console.log("✅ Seed concluído!"))
+  .catch((e) => {
+    console.error(e);
     process.exit(1);
   })
   .finally(async () => {
