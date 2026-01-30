@@ -1,5 +1,5 @@
-import { prisma } from "../../lib/prisma";
-import { AppointmentModal } from "../../lib/appointment-modal";
+import { prisma } from "./prisma";
+import { AppointmentModal } from "./appointment-modal";
 import { Heart, Activity, User, Stethoscope, Baby, Pill } from "lucide-react";
 
 export default async function DashboardPage() {
