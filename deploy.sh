@@ -7,7 +7,7 @@
 export DATABASE_URL=${DATABASE_URL:-"postgresql://build:build@localhost:5432/build_db"}
 
 echo "🧹 Limpando arquivos conflitantes..."
-rm -f "pages/[id].ts" "pages/[id].js" "pages/[id].tsx"
+rm -f "pages/[id].ts" "pages/[id].js" "pages/[id].tsx" "pages/delete.tsx" "pages/create.tsx" "pages/index.ts"
 
 echo "📦 Instalando dependências..."
 npm install
