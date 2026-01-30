@@ -10,9 +10,6 @@ export default defineConfig({
     seed: "tsx prisma/seed.ts",
   },
   datasource: {
-    adapter: {
-      provider: "postgres",
-      url: process.env.DATABASE_URL!,   // ✅ URL aqui
-    },
+    url: process.env.DATABASE_URL!,   // ✅ URL aqui
   },
 });
