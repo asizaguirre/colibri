@@ -1,11 +1,11 @@
 import 'dotenv/config';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Role, Specialty, AppointmentStatus } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 async function main() {
   // Usuário paciente
-  await prisma.user.create({
+  const paciente = await prisma.user.create({
     data: {
       email: "paciente@teste.com",
       name: "Paciente Teste",
@@ -13,8 +13,8 @@ async function main() {
     },
   });
 
-  // Usuário profissional
-  await prisma.user.create({
+  // Usuário profissional com perfil
+  const profissional = await prisma.user.create({
     data: {
       email: "profissional@teste.com",
       name: "Dr. Ginecologista",
@@ -23,10 +23,11 @@ async function main() {
         create: {
           crm: "12345",
           bio: "Especialista em saúde da mulher",
-          specialty: "GYNECOLOGIST",
+          specialty: Specialty.GYNECOLOGIST, // ✅ enum correto
         },
       },
     },
+    include: { professionalProfile: true },
   });
 
   // Insumo
@@ -39,9 +40,25 @@ async function main() {
       minQuantity: 10,
     },
   });
+
+  // Consulta de exemplo
+  await prisma.appointment.create({
+    data: {
+      date: new Date(),
+      status: AppointmentStatus.CONFIRMED,
+      notes: "Primeira consulta de rotina",
+      patientId: paciente.id,
+      professionalId: profissional.professionalProfile!.id,
+    },
+  });
 }
 
 main()
   .then(() => console.log("✅ Seed concluído"))
-  .catch(e => console.error("❌ Erro no seed:", e))
-  .finally(async () => await prisma.$disconnect());
+  .catch(e => {
+    console.error("❌ Erro no seed:", e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

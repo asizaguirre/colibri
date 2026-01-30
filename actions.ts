@@ -9,7 +9,7 @@ import { Specialty, Role, AppointmentStatus } from '@prisma/client';
 const AppointmentSchema = z.object({
   name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres"),
   email: z.string().email("E-mail inválido"),
-  category: z.nativeEnum(Specialty),
+  specialty: z.nativeEnum(Specialty),
 });
 
 export async function getDashboardData() {
@@ -36,7 +36,7 @@ export async function createAppointment(formData: FormData) {
   const validatedFields = AppointmentSchema.safeParse({
     name: formData.get('name'),
     email: formData.get('email'),
-    category: formData.get('category'),
+    specialty: formData.get('specialty'),
   });
 
   if (!validatedFields.success) {
@@ -44,7 +44,7 @@ export async function createAppointment(formData: FormData) {
   }
 
   try {
-    const targetSpecialty = validatedFields.data.category;
+    const targetSpecialty = validatedFields.data.specialty;
 
     // 2. Busca um profissional disponível (regra simples: o primeiro encontrado)
     const professional = await prisma.professional.findFirst({
@@ -60,7 +60,7 @@ export async function createAppointment(formData: FormData) {
       data: {
         date: new Date(), // Define data atual para "Fila de Espera"
         status: AppointmentStatus.PENDING,
-        notes: `Solicitação via Dashboard. Categoria: ${validatedFields.data.category}`,
+        notes: `Solicitação via Dashboard. Especialidade: ${validatedFields.data.specialty}`,
         professional: { connect: { id: professional.id } },
         patient: {
           connectOrCreate: {

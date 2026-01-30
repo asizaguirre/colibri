@@ -3,20 +3,7 @@
 import { useState } from "react";
 import { createAppointment } from "../actions";
 import { PlusCircle, X } from "lucide-react";
-import { Specialty } from "@prisma/client";
-
-function translateSpecialty(value: Specialty): string {
-  switch (value) {
-    case Specialty.GYNECOLOGIST:
-      return "Ginecologista (Pré-Concepção)";
-    case Specialty.OBSTETRICIAN:
-      return "Obstetra";
-    case Specialty.PEDIATRICIAN:
-      return "Pediatra";
-    default:
-      return value;
-  }
-}
+import { SpecialtySelect } from "./selects";
 
 export function AppointmentModal() {
   const [isOpen, setIsOpen] = useState(false);
@@ -63,16 +50,7 @@ export function AppointmentModal() {
                 <input name="email" type="email" required className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none" />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Especialidade</label>
-                <select name="category" className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none">
-                  {Object.values(Specialty).map((value) => (
-                    <option key={value} value={value}>
-                      {translateSpecialty(value)}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <SpecialtySelect />
 
               <button disabled={isPending} type="submit" className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors disabled:opacity-50">
                 {isPending ? "Enviando..." : "Confirmar Solicitação"}
