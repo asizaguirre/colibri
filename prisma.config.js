@@ -8,6 +8,7 @@ module.exports = defineConfig({
     seed: "tsx prisma/seed.ts",
   },
   datasource: {
-    url: process.env.DATABASE_URL,  // string completa do .env
+    adapter: "postgresql",
+    url: process.env.DATABASE_URL,
   },
 });
