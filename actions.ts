@@ -3,6 +3,7 @@
 import { z } from 'zod';
 import prisma from './lib/prisma';
 import { revalidatePath } from 'next/cache';
+import { Specialty } from '@prisma/client';
 
 // Schema validado para a jornada da Life Clinic
 const AppointmentSchema = z.object({
@@ -14,11 +15,11 @@ const AppointmentSchema = z.object({
 export async function getDashboardData() {
   const [gynecologists, specialists, supplies, appointmentsCount] = await Promise.all([
     prisma.professional.findMany({
-      where: { specialty: "Ginecologista" },
+      where: { specialty: Specialty.GYNECOLOGIST },
       include: { user: true },
     }),
     prisma.professional.findMany({
-      where: { specialty: "Especialista" },
+      where: { specialty: Specialty.OBSTETRICIAN },
       include: { user: true },
     }),
     prisma.supply.findMany({
@@ -44,7 +45,11 @@ export async function createAppointment(formData: FormData) {
 
   try {
     // 1. Trata a categoria como string para evitar conflitos de Enum
-    const targetSpecialty = validatedFields.data.category as any;
+    const specialtyMap: Record<string, Specialty> = {
+      "Ginecologista": Specialty.GYNECOLOGIST,
+      "Especialista": Specialty.OBSTETRICIAN
+    };
+    const targetSpecialty = specialtyMap[validatedFields.data.category];
 
     // 2. Busca um profissional disponível (regra simples: o primeiro encontrado)
     const professional = await prisma.professional.findFirst({
