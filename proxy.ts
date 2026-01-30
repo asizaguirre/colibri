@@ -1,12 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-export default async function proxy(req: Request) {
+export default async function proxy(req: NextRequest) {
   const url = new URL(req.url);
-  // getToken requer 'req' como NextRequest ou objeto compatível.
-  // Em proxy.ts (Next.js 16), 'req' é Request padrão.
-  // O cast ou adaptação pode ser necessário dependendo da versão exata do next-auth.
-  const token = await getToken({ req: req as any, secret: process.env.NEXTAUTH_SECRET });
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
   // 🔹 Se não estiver logado, redireciona para /login
   if (!token) {

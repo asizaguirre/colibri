@@ -6,14 +6,17 @@
 
 export DATABASE_URL=${DATABASE_URL:-"postgresql://build:build@localhost:5432/build_db"}
 
-echo "📦 Instalando dependências e gerando Prisma Client..."
-# O npm install vai rodar o postinstall, que agora funcionará graças ao export acima
+echo "📦 Instalando dependências..."
 npm install
 
-echo "Tb Adicionando arquivos ao Git..."
+echo "🔄 Gerando Prisma Client (Garantia de estabilidade)..."
+# Garante que o cliente esteja sincronizado com o schema atual
+npx prisma generate
+
+echo "📝 Adicionando arquivos ao Git..."
 git add .
 
-echo "VX Criando commit de produção..."
+echo "🔒 Criando commit de produção..."
 git commit -m "Deploy: Atualização automática para produção" || echo "⚠️ Nada a commitar, continuando..."
 
 echo "🚀 Enviando para o GitHub..."

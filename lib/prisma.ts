@@ -1,13 +1,9 @@
-// lib/prisma.ts
 import { PrismaClient } from "@prisma/client";
 
-// Evita criar múltiplas instâncias em dev (hot reload do Next.js)
-const globalForPrisma = global as unknown as { prisma?: PrismaClient };
+const globalForPrisma = global as any;
 
 export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient();   // ✅ instanciado sem opções
+  globalForPrisma.prisma ||
+  new PrismaClient();
 
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma;
-}
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;

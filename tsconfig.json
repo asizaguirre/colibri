@@ -17,7 +17,8 @@
     "paths": {
       "@/*": ["./*"]
     },
-    "baseUrl": "."
+    "baseUrl": ".",
+    "types": ["node", "jest"]  // ✅ adiciona suporte ao Node e opcionalmente ao Jest
   },
   "include": [
     "next-env.d.ts",
