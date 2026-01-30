@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { Supply } from "@prisma/client";
 import { AppointmentModal } from "@/lib/appointment-modal";
 import { 
   Heart, 
@@ -122,7 +123,7 @@ export default async function DashboardPage() {
           
           <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:scale-[1.02] transition-all duration-300">
             <div className="space-y-2">
-              {supplies.length > 0 ? supplies.map((item) => (
+              {supplies.length > 0 ? supplies.map((item: Supply) => (
                 <div key={item.id} className="flex items-center justify-between p-3 rounded-2xl hover:bg-slate-50 transition-colors group">
                   <div className="flex items-center gap-3">
                     <div className={`p-2 rounded-full transition-colors ${item.quantity > item.minQuantity ? 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100' : 'bg-rose-50 text-rose-600 group-hover:bg-rose-100'}`}>
