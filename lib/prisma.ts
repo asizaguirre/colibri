@@ -5,6 +5,6 @@ const globalForPrisma = global as any;
 
 export const prisma =
   globalForPrisma.prisma ||
-  new PrismaClient();   // ✅ não precisa passar nada
+  new PrismaClient();   // ✅ não passe opções aqui
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
