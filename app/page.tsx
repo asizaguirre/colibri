@@ -1,6 +1,4 @@
-import { prisma } from "@/lib/prisma";
-import { getDashboardData } from "@/actions";
-import { Supply } from "@prisma/client";
+import { getDashboardData } from "../actions";
 import { AppointmentModal } from "@/lib/appointment-modal";
 import { 
   Heart, 
@@ -9,129 +7,129 @@ import {
   Stethoscope, 
   Pill, 
   CheckCircle2,
-  Calendar,
-  ArrowRight
+  ArrowRight,
+  ShieldAlert
 } from "lucide-react";
+import { getServerSession } from "next-auth";
+import Link from "next/link";
 
 export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
-  const gynecologists = await prisma.professional.findMany({
-    where: { specialty: "Ginecologista" },
-    include: { user: true },
-  });
-  const { gynecologists, specialists, supplies } = await getDashboardData();
+  const session = await getServerSession();
 
-  const specialists = await prisma.professional.findMany({
-    where: { specialty: "Especialista" },
-    include: { user: true },
-  });
-
-  const supplies = await prisma.supply.findMany({
-    orderBy: { quantity: 'asc' },
-    take: 5
-  });
-
-  return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-800 tracking-tight">
-            Olá, Paciente
-          </h1>
-          <p className="text-slate-500 mt-1">
-            Bem-vindo(a) de volta à sua jornada de cuidado.
-          </p>
-        </div>
-        <div className="hidden md:block">
-           <span className="px-4 py-2 bg-sky-50 text-sky-600 rounded-full text-sm font-bold border border-sky-100">
-             Plano Premium
-           </span>
+  if (!session) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-4">
+        <div className="w-full max-w-md bg-white rounded-[2rem] shadow-xl shadow-blue-500/5 p-8 text-center space-y-6 border border-slate-100">
+          <div className="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center mx-auto">
+            <ShieldAlert className="w-8 h-8 text-rose-500" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-slate-800">Acesso Restrito</h1>
+            <p className="text-slate-500 mt-2">Faça login para acessar sua jornada de cuidado.</p>
+          </div>
+          <Link 
+            href="/" 
+            className="block w-full py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-all"
+          >
+            Ir para Login
+          </Link>
         </div>
       </div>
+    );
+  }
 
-      {/* Card Jornada do Cuidado */}
-      <section className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:scale-[1.01] transition-transform duration-300 ease-out">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="p-2.5 bg-indigo-50 rounded-full">
-            <Heart className="w-6 h-6 text-indigo-500 fill-indigo-500" />
+  const { gynecologists, specialists, supplies } = await getDashboardData();
+
+  return (
+    <div className="min-h-screen bg-slate-50 p-6 lg:p-10 space-y-10">
+      {/* Header */}
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-sky-100 rounded-xl">
+              <Heart className="w-5 h-5 text-sky-600 fill-sky-600" />
+            </div>
+            <span className="text-sm font-bold text-sky-600 tracking-wide uppercase">Life Clinic</span>
           </div>
-          <h2 className="text-xl font-bold text-slate-800">Jornada do Cuidado</h2>
-        </div>
-        
-        <div className="relative pt-2">
-          <div className="flex mb-3 items-center justify-between text-xs font-bold text-slate-400 uppercase tracking-wider">
-            <span className="text-sky-600">Pré-Concepção</span>
-            <span className="text-sky-600">Tratamento</span>
-            <span>Gestação</span>
-          </div>
-          <div className="overflow-hidden h-3 mb-4 text-xs flex rounded-full bg-slate-100">
-            <div style={{ width: "60%" }} className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-sky-400 to-indigo-500 rounded-full"></div>
-          </div>
-          <p className="text-sm text-slate-600">
-            Você completou a fase de <span className="font-bold text-sky-600">Diagnóstico Inicial</span>. Próximo passo: Consulta com Especialista.
+          <h1 className="text-4xl font-bold text-slate-900 tracking-tight">
+            Olá, {session.user?.name?.split(' ')[0]}
+          </h1>
+          <p className="text-slate-500 mt-2 text-lg">
+            Sua saúde está em dia. Vamos cuidar de você hoje?
           </p>
         </div>
-      </section>
+        <div className="flex items-center gap-4">
+           <div className="hidden md:flex flex-col items-end">
+             <span className="text-sm font-bold text-slate-700">{session.user?.name}</span>
+             <span className="text-xs text-sky-500 font-medium">Paciente Premium</span>
+           </div>
+           <div className="w-12 h-12 rounded-full bg-slate-200 border-2 border-white shadow-sm overflow-hidden">
+             {session.user?.image ? (
+               <img src={session.user.image} alt="Avatar" className="w-full h-full object-cover" />
+             ) : (
+               <div className="w-full h-full flex items-center justify-center text-slate-400"><User /></div>
+             )}
+           </div>
+        </div>
+      </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Grid de Especialistas */}
+        {/* Rede de Acolhimento (Médicos) */}
         <div className="lg:col-span-2 space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-              <Stethoscope className="w-5 h-5 text-sky-500" />
-              Rede de Especialistas
+            <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
+              <div className="p-2 bg-white rounded-xl shadow-sm"><Stethoscope className="w-6 h-6 text-sky-500" /></div>
+              Rede de Acolhimento
             </h2>
             <AppointmentModal />
           </div>
 
           <div className="grid md:grid-cols-2 gap-5">
             {[...gynecologists, ...specialists].map((doc) => (
-              <div key={doc.id} className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300 group">
-                <div className="flex items-start gap-4">
-                  <div className="w-16 h-16 rounded-2xl bg-slate-50 overflow-hidden flex-shrink-0 border border-slate-100">
+              <div key={doc.id} className="bg-white p-6 rounded-[2rem] shadow-xl shadow-blue-500/5 border border-slate-100 hover:-translate-y-1 transition-all duration-300 group">
+                <div className="flex items-center gap-5">
+                  <div className="w-20 h-20 rounded-2xl bg-slate-50 overflow-hidden flex-shrink-0 border-2 border-white shadow-sm">
                     {doc.user.image ? (
                       <img src={doc.user.image} alt={doc.user.name || "Médico"} className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-slate-300">
-                        <User className="w-8 h-8" />
-                      </div>
+                      <div className="w-full h-full flex items-center justify-center text-slate-300"><User className="w-8 h-8" /></div>
                     )}
                   </div>
                   <div className="min-w-0">
-                    <h3 className="font-bold text-slate-800 truncate">{doc.user.name}</h3>
-                    <p className="text-sm text-sky-600 font-medium mb-1 truncate">{doc.specialty}</p>
-                    <p className="text-xs text-slate-400 bg-slate-50 inline-block px-2 py-0.5 rounded-md">CRM: {doc.crm}</p>
+                    <h3 className="font-bold text-lg text-slate-800 truncate">{doc.user.name}</h3>
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold mt-1 ${
+                      doc.specialty === 'Ginecologista' ? 'bg-pink-50 text-pink-600' : 'bg-indigo-50 text-indigo-600'
+                    }`}>
+                      {doc.specialty}
+                    </span>
                   </div>
                 </div>
-                <button className="mt-5 w-full py-3 bg-slate-50 text-slate-600 font-bold text-sm rounded-full group-hover:bg-sky-500 group-hover:text-white transition-all duration-300 flex items-center justify-center gap-2">
+                <button className="mt-6 w-full py-4 bg-slate-50 text-slate-600 font-bold text-sm rounded-2xl group-hover:bg-slate-900 group-hover:text-white transition-all duration-300 flex items-center justify-center gap-2">
                   Agendar <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
             ))}
-            {[...gynecologists, ...specialists].length === 0 && (
-               <div className="col-span-2 p-10 text-center bg-white rounded-3xl border border-dashed border-slate-200">
-                 <p className="text-slate-500">Nenhum especialista disponível no momento.</p>
-               </div>
-            )}
           </div>
         </div>
 
-        {/* Painel Smart Insumos */}
+        {/* Smart Insumos */}
         <div className="space-y-6">
-          <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <Activity className="w-5 h-5 text-indigo-500" />
+          <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
+            <div className="p-2 bg-white rounded-xl shadow-sm"><Activity className="w-6 h-6 text-indigo-500" /></div>
             Smart Insumos
           </h2>
           
-          <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:scale-[1.02] transition-all duration-300">
-            <div className="space-y-2">
-              {supplies.length > 0 ? supplies.map((item: Supply) => (
-                <div key={item.id} className="flex items-center justify-between p-3 rounded-2xl hover:bg-slate-50 transition-colors group">
+          <div className="bg-white p-6 rounded-[2rem] shadow-xl shadow-blue-500/5 border border-slate-100">
+            <div className="space-y-4">
+              {supplies.map((item) => (
+                <div key={item.id} className="flex items-center justify-between p-4 rounded-2xl bg-slate-50/50 hover:bg-slate-50 transition-colors group">
                   <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-full transition-colors ${item.quantity > item.minQuantity ? 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100' : 'bg-rose-50 text-rose-600 group-hover:bg-rose-100'}`}>
-                      <Pill className="w-4 h-4" />
+                    <div className={`p-3 rounded-xl ${
+                      item.quantity > item.minQuantity ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'
+                    }`}>
+                      <Pill className="w-5 h-5" />
                     </div>
                     <div>
                       <p className="text-sm font-bold text-slate-700">{item.name}</p>
@@ -139,17 +137,15 @@ export default async function DashboardPage() {
                     </div>
                   </div>
                   {item.quantity > item.minQuantity ? (
-                    <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                    <CheckCircle2 className="w-6 h-6 text-emerald-500" />
                   ) : (
-                    <span className="text-[10px] font-bold text-rose-500 bg-rose-50 px-2 py-1 rounded-full border border-rose-100">Repor</span>
+                    <span className="text-xs font-bold text-amber-600 bg-amber-50 px-3 py-1 rounded-full">Atenção</span>
                   )}
                 </div>
-              )) : (
-                <p className="text-sm text-slate-400 text-center py-4">Estoque vazio.</p>
-              )}
+              ))}
             </div>
             
-            <button className="w-full mt-6 py-3 border border-slate-200 text-slate-600 font-bold text-sm rounded-full hover:bg-slate-50 hover:text-slate-900 transition-colors">
+            <button className="w-full mt-6 py-4 border-2 border-slate-100 text-slate-600 font-bold text-sm rounded-2xl hover:border-slate-200 hover:bg-slate-50 transition-all">
               Gerenciar Estoque
             </button>
           </div>

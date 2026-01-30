@@ -11,6 +11,26 @@ const AppointmentSchema = z.object({
   category: z.enum(["Ginecologista", "Especialista"]),
 });
 
+export async function getDashboardData() {
+  const [gynecologists, specialists, supplies, appointmentsCount] = await Promise.all([
+    prisma.professional.findMany({
+      where: { specialty: "Ginecologista" },
+      include: { user: true },
+    }),
+    prisma.professional.findMany({
+      where: { specialty: "Especialista" },
+      include: { user: true },
+    }),
+    prisma.supply.findMany({
+      orderBy: { quantity: 'asc' },
+      take: 5
+    }),
+    prisma.appointment.count(),
+  ]);
+
+  return { gynecologists, specialists, supplies, appointmentsCount };
+}
+
 export async function createAppointment(formData: FormData) {
   const validatedFields = AppointmentSchema.safeParse({
     name: formData.get('name'),
