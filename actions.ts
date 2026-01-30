@@ -62,3 +62,53 @@ export async function createAppointment(formData: FormData) {
     return { error: "Erro ao conectar com o banco de dados." };
   }
 }
+
+// Novo Schema para o BookingModal
+const BookingSchema = z.object({
+  name: z.string().min(2, "Nome é obrigatório"),
+  email: z.string().email("E-mail inválido"),
+  professionalId: z.string().min(1, "Selecione um médico"),
+  date: z.string().min(1, "Selecione uma data"),
+});
+
+export async function scheduleAppointment(formData: FormData) {
+  const rawData = {
+    name: formData.get('name'),
+    email: formData.get('email'),
+    professionalId: formData.get('professionalId'),
+    date: formData.get('date'),
+  };
+
+  const validated = BookingSchema.safeParse(rawData);
+
+  if (!validated.success) {
+    return { error: validated.error.flatten().fieldErrors };
+  }
+
+  try {
+    await prisma.appointment.create({
+      data: {
+        date: new Date(validated.data.date),
+        status: 'PENDING',
+        notes: "Agendamento via BookingModal (Ciclo Completo)",
+        professional: { connect: { id: validated.data.professionalId } },
+        patient: {
+          connectOrCreate: {
+            where: { email: validated.data.email },
+            create: {
+              email: validated.data.email,
+              name: validated.data.name,
+              role: 'PATIENT'
+            },
+          },
+        },
+      },
+    });
+
+    revalidatePath('/dashboard');
+    return { success: true };
+  } catch (e) {
+    console.error(e);
+    return { error: "Erro ao processar agendamento." };
+  }
+}

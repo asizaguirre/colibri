@@ -1,142 +1,59 @@
-import { prisma } from '@/lib/prisma';
-import { AppointmentModal } from '@/lib/appointment-modal';
-import { Heart, Activity, User, Stethoscope, Baby, Pill } from "lucide-react";
+"use client";
 
-export default async function DashboardPage() {
-  const gynecologists = await prisma.professional.findMany({
-    where: { specialty: "Ginecologista" },
-    include: { user: true },
-  });
+import { signIn } from "next-auth/react";
+import { Heart } from "lucide-react";
 
-  const specialists = await prisma.professional.findMany({
-    where: { specialty: "Especialista" },
-    include: { user: true },
-  });
-
-  const supplies = await prisma.supply.findMany({
-    orderBy: { quantity: 'asc' },
-  });
-
+export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-slate-100 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-24 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-[#00a3e0]/10 rounded-2xl">
-              <Heart className="h-8 w-8 text-[#00a3e0]" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-[#00a3e0] tracking-tight">Colibri 2.0</h1>
-              <p className="text-slate-500 text-sm font-medium">Rede de Acolhimento Life Clinic</p>
-            </div>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-4">
+      <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-8 space-y-8 text-center border border-slate-100 animate-in fade-in zoom-in duration-500">
+        
+        {/* Logo & Branding */}
+        <div className="flex flex-col items-center gap-4">
+          <div className="p-4 bg-sky-50 rounded-full">
+            <Heart className="w-10 h-10 text-sky-500 fill-sky-500" />
           </div>
-          <AppointmentModal />
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 lg:grid-cols-3 gap-10">
-
-        {/* Coluna Principal */}
-        <div className="lg:col-span-2 space-y-12">
-
-          {/* Pré-Concepção */}
-          <section>
-            <div className="flex items-center gap-4 mb-6">
-              <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100">
-                <Stethoscope className="h-6 w-6 text-[#00a3e0]" />
-              </div>
-              <h2 className="text-2xl font-bold text-slate-800">Pré-Concepção</h2>
-            </div>
-            <div className="grid gap-6 sm:grid-cols-2">
-              {gynecologists.map((doc) => (
-                <div key={doc.id} className="bg-white p-6 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-50 group">
-                  <div className="flex items-center gap-4">
-                    <div className="h-16 w-16 rounded-full bg-slate-50 flex items-center justify-center overflow-hidden border-4 border-slate-50 shadow-sm group-hover:border-[#00a3e0]/20 transition-colors">
-                      {doc.user.image ? <img src={doc.user.image} alt={doc.user.name || "Médico"} className="w-full h-full object-cover" /> : <User className="h-8 w-8 text-[#00a3e0]" />}
-                    </div>
-                    <div>
-                      <p className="font-bold text-slate-900 text-lg">{doc.user.name}</p>
-                      <p className="text-sm text-[#00a3e0] font-medium">Ginecologista</p>
-                      <p className="text-xs text-slate-400 mt-2 bg-slate-50 px-3 py-1 rounded-full inline-block font-medium">CRM: {doc.crm || "N/A"}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-               {gynecologists.length === 0 && <p className="text-slate-500 italic pl-2">Nenhum profissional disponível.</p>}
-            </div>
-          </section>
-
-          {/* Concepção */}
-          <section>
-            <div className="flex items-center gap-4 mb-6">
-              <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100">
-                <Baby className="h-6 w-6 text-rose-500" />
-              </div>
-              <h2 className="text-2xl font-bold text-slate-800">Concepção</h2>
-            </div>
-            <div className="grid gap-6 sm:grid-cols-2">
-              {specialists.map((doc) => (
-                <div key={doc.id} className="bg-white p-6 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-50 group">
-                  <div className="flex items-center gap-4">
-                    <div className="h-16 w-16 rounded-full bg-rose-50 flex items-center justify-center overflow-hidden border-4 border-rose-50 shadow-sm group-hover:border-rose-100 transition-colors">
-                      {doc.user.image ? <img src={doc.user.image} alt={doc.user.name || "Médico"} className="w-full h-full object-cover" /> : <User className="h-8 w-8 text-rose-400" />}
-                    </div>
-                    <div>
-                      <p className="font-bold text-slate-900 text-lg">{doc.user.name}</p>
-                      <p className="text-sm text-rose-600 font-medium">Especialista em Reprodução</p>
-                      <p className="text-xs text-slate-400 mt-2 bg-slate-50 px-3 py-1 rounded-full inline-block font-medium">CRM: {doc.crm || "N/A"}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-               {specialists.length === 0 && <p className="text-slate-500 italic pl-2">Nenhum profissional disponível.</p>}
-            </div>
-          </section>
+          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
+            Life Colibri
+          </h1>
+          <p className="text-slate-500 font-medium text-lg">
+            Integrando a sua jornada de cuidado.
+          </p>
         </div>
 
-        {/* Coluna Lateral: Smart Insumos */}
-        <aside className="space-y-8">
-          <div className="bg-white p-8 rounded-3xl shadow-lg border border-slate-50 relative overflow-hidden">
-            {/* Elemento decorativo de fundo */}
-            <div className="absolute top-0 right-0 w-40 h-40 bg-[#00a3e0]/5 rounded-bl-[4rem] -mr-8 -mt-8"></div>
-            
-            <div className="flex items-center gap-4 mb-8 relative z-10">
-              <div className="p-3 bg-[#00a3e0]/10 rounded-2xl">
-                <Activity className="h-6 w-6 text-[#00a3e0]" />
-              </div>
-              <h3 className="font-bold text-xl text-slate-800">Smart Insumos</h3>
-            </div>
+        {/* Login Button */}
+        <div className="space-y-4 pt-4">
+          <button
+            onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+            className="w-full flex items-center justify-center gap-3 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold py-3.5 px-4 rounded-full transition-all duration-200 hover:shadow-md active:scale-[0.98]"
+          >
+            {/* Google Logo SVG */}
+            <svg className="w-5 h-5" viewBox="0 0 24 24">
+              <path
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                fill="#4285F4"
+              />
+              <path
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                fill="#34A853"
+              />
+              <path
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                fill="#FBBC05"
+              />
+              <path
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                fill="#EA4335"
+              />
+            </svg>
+            Entrar com Google
+          </button>
+        </div>
 
-            <div className="space-y-4 relative z-10">
-              {(supplies.length > 0 ? supplies : [
-                { id: 991, name: 'Ácido Fólico', quantity: 30, unit: 'caps', minQuantity: 10 },
-                { id: 992, name: 'Vitaminas', quantity: 5, unit: 'caps', minQuantity: 10 }
-              ]).map((item) => (
-                 <div key={item.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-[#00a3e0]/30 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-white rounded-xl shadow-sm">
-                        <Pill className="h-5 w-5 text-[#00a3e0]" />
-                    </div>
-                    <div>
-                      <p className="font-bold text-slate-900 text-sm">{item.name}</p>
-                      <p className="text-xs text-slate-500">{item.quantity} {item.unit}</p>
-                    </div>
-                  </div>
-                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${item.quantity <= item.minQuantity ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600'}`}>
-                    {item.quantity <= item.minQuantity ? 'Repor' : 'Em Estoque'}
-                  </span>
-                </div>
-              ))}
-            </div>
-            
-            <button className="w-full mt-8 py-4 text-sm text-white font-bold bg-[#00a3e0] hover:bg-[#008bbd] rounded-2xl transition-colors shadow-md shadow-[#00a3e0]/20">
-              Gerenciar Estoque
-            </button>
-          </div>
-        </aside>
-
-      </main>
+        <div className="text-xs text-slate-400">
+          Ao entrar, você concorda com nossos Termos de Uso e Política de Privacidade.
+        </div>
+      </div>
     </div>
   );
 }
