@@ -1,4 +1,4 @@
-const { defineConfig } = require("prisma/config");
+const { defineConfig } = require("@prisma/config"); // ✅ pacote correto
 require("dotenv").config();
 
 module.exports = defineConfig({
@@ -8,6 +8,7 @@ module.exports = defineConfig({
     seed: "tsx prisma/seed.ts",
   },
   datasource: {
-    url: process.env.DATABASE_URL, // ✅ obrigatório
+    adapter: "postgresql",              // ✅ tipo de banco
+    url: process.env.DATABASE_URL,      // ✅ obrigatório
   },
 });
