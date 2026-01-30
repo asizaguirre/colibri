@@ -9,7 +9,7 @@ import { Specialty, Role, AppointmentStatus } from '@prisma/client';
 const AppointmentSchema = z.object({
   name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres"),
   email: z.string().email("E-mail inválido"),
-  category: z.enum([Specialty.GYNECOLOGIST, "Especialista"]),
+  category: z.nativeEnum(Specialty),
 });
 
 export async function getDashboardData() {
@@ -44,12 +44,7 @@ export async function createAppointment(formData: FormData) {
   }
 
   try {
-    // 1. Trata a categoria como string para evitar conflitos de Enum
-    const specialtyMap: Record<string, Specialty> = {
-      Specialty.GYNECOLOGIST: Specialty.GYNECOLOGIST,
-      "Especialista": Specialty.OBSTETRICIAN
-    };
-    const targetSpecialty = specialtyMap[validatedFields.data.category];
+    const targetSpecialty = validatedFields.data.category;
 
     // 2. Busca um profissional disponível (regra simples: o primeiro encontrado)
     const professional = await prisma.professional.findFirst({
