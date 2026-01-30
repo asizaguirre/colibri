@@ -91,7 +91,7 @@ export async function scheduleAppointment(formData: FormData) {
         date: new Date(validated.data.date),
         status: 'PENDING',
         notes: "Agendamento via BookingModal (Ciclo Completo)",
-        professional: { connect: { id: validated.data.professionalId } },
+        professional: { connect: { id: Number(validated.data.professionalId) } },
         patient: {
           connectOrCreate: {
             where: { email: validated.data.email },
