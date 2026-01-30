@@ -13,6 +13,23 @@ import {
 import { getServerSession } from "next-auth";
 import Link from "next/link";
 
+type Professional = {
+  id: string;
+  specialty: string;
+  user: {
+    name: string | null;
+    image: string | null;
+  };
+};
+
+type Supply = {
+  id: string;
+  name: string;
+  quantity: number;
+  unit: string;
+  minQuantity: number;
+};
+
 export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
@@ -87,7 +104,7 @@ export default async function DashboardPage() {
           </div>
 
           <div className="grid md:grid-cols-2 gap-5">
-            {[...gynecologists, ...specialists].map((doc: any) => (
+            {[...gynecologists, ...specialists].map((doc: Professional) => (
               <div key={doc.id} className="bg-white p-6 rounded-[2rem] shadow-xl shadow-blue-500/5 border border-slate-100 hover:-translate-y-1 transition-all duration-300 group">
                 <div className="flex items-center gap-5">
                   <div className="w-20 h-20 rounded-2xl bg-slate-50 overflow-hidden flex-shrink-0 border-2 border-white shadow-sm">
@@ -123,7 +140,7 @@ export default async function DashboardPage() {
           
           <div className="bg-white p-6 rounded-[2rem] shadow-xl shadow-blue-500/5 border border-slate-100">
             <div className="space-y-4">
-              {supplies.map((item: any) => (
+              {supplies.map((item: Supply) => (
                 <div key={item.id} className="flex items-center justify-between p-4 rounded-2xl bg-slate-50/50 hover:bg-slate-50 transition-colors group">
                   <div className="flex items-center gap-3">
                     <div className={`p-3 rounded-xl ${
