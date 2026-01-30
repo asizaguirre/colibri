@@ -1,0 +1,50 @@
+{
+  "node": {
+    "00d11af6933d4d7ffe44d5e5dcab6df45e4328278a": {
+      "workers": {
+        "app/page": {
+          "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getDashboardData",
+          "filename": "actions.ts"
+        }
+      },
+      "layer": {
+        "app/page": "rsc"
+      },
+      "exportedName": "getDashboardData",
+      "filename": "actions.ts"
+    },
+    "409695d084874d54bb7591261994339246d267f57f": {
+      "workers": {
+        "app/page": {
+          "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "createAppointment",
+          "filename": "actions.ts"
+        }
+      },
+      "layer": {
+        "app/page": "action-browser"
+      },
+      "exportedName": "createAppointment",
+      "filename": "actions.ts"
+    },
+    "40c417288b7821425586f497925172b6fd3c99f137": {
+      "workers": {
+        "app/page": {
+          "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "scheduleAppointment",
+          "filename": "actions.ts"
+        }
+      },
+      "layer": {
+        "app/page": "rsc"
+      },
+      "exportedName": "scheduleAppointment",
+      "filename": "actions.ts"
+    }
+  },
+  "edge": {}
+}
