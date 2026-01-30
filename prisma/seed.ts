@@ -1,15 +1,19 @@
 import 'dotenv/config';
 import { PrismaClient, Role, Specialty, AppointmentStatus } from '@prisma/client';
+import { hash } from "bcryptjs";
 
 const prisma = new PrismaClient();
 
 async function main() {
+  const senhaHash = await hash("123456", 10);
+
   // Usuário paciente
   const paciente = await prisma.user.create({
     data: {
       email: "paciente@teste.com",
       name: "Paciente Teste",
       role: Role.PATIENT,
+      password: senhaHash,
     },
   });
 
